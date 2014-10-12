@@ -18,6 +18,7 @@ def day_view(day):
 def range_view(past, pre):
     pass
 
+
 if __name__ == "__main__":
     with open('pwsd') as f:
         pwsd = f.read()
