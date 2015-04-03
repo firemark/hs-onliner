@@ -1,41 +1,25 @@
-from flask import Flask, jsonify
-from functools import wraps
+from flask import Flask
+from converters import DateConverter
+from db import get_db
+
+db = None
+pwsd = None
+
+app = Flask(__name__)
+app.url_map.converters['date'] = DateConverter
 
 
-class MyFlask(Flask):
-   
-    @staticmethod
-    def pre(*args, **kwargs):
-        """method run before request"""
+@app.route("/<date:day>", methods=['GET'])
+def day_view(day):
+    pass
 
-    @staticmethod
-    def pro(return_value, *args, **kwargs):
-        """method run after request"""
-        return jsonify(return_value)
 
-    def route(self, rule, **options):
-        """extended Flask.route - add to function pre and pro method """
-        old_decorator = super().route(rule, **options)
-
-        def decorator(f):
-            @wraps(f)
-            def func(*args, **kwargs):
-                self.pre(*args, **kwargs)
-                return_value = f(*args, **kwargs)
-                return self.pro(return_value, *args, **kwargs)
-
-            old_decorator(func)
-            return f
-
-        return decorator
-
-app = MyFlask(__name__)
-
-@app.route("/")
-def hello():
-    return {'message': 'Hello world!'}
-
-print(hello())
+@app.route("/<date:past>/<date:pre>}", methods=['GET'])
+def range_view(past, pre):
+    pass
 
 if __name__ == "__main__":
+    with open('pwsd') as f:
+        pwsd = f.read()
+    db = get_db('/tmp/firemark')
     app.run()
