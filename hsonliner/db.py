@@ -5,6 +5,9 @@ import time
 
 def get_db(pathname):
     db = Database(pathname)
+    if db.exists():
+        return db
+
     db.create()
     ind = DateIndex(db.path, 'timestamp')
     db.add_index(ind)
