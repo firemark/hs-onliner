@@ -1,12 +1,15 @@
-from werkzeug.routing import BaseConverter
-from datetime import date
+from werkzeug.routing import BaseConverter, ValidationError
+from datetime import datetime
 
 class DateConverter(BaseConverter):
     date_format = "%d-%M-%Y"
 
     @classmethod
     def to_python(cls, value):
-        return date.strptime(value, cls.date_format)
+        try:
+            return datetime.strptime(value, cls.date_format)
+        except ValueError:
+            raise ValidationError()
 
     @classmethod
     def to_url(cls, value):

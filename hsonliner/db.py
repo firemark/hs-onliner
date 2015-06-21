@@ -1,23 +1,31 @@
 from CodernityDB.database import Database
 from CodernityDB.tree_index import TreeBasedIndex
-import time
+from time import mktime
+from datetime import date
 
 
 def get_db(pathname):
     db = Database(pathname)
     if db.exists():
+        db.open()
         return db
 
     db.create()
-    ind = DateIndex(db.path, 'timestamp')
+    ind = DateIndex(db.path, 'days')
     db.add_index(ind)
 
     return db
 
 
 class DateIndex(TreeBasedIndex):
+    custom_header = (
+        'from CodernityDB.tree_index import TreeBasedIndex\n'
+        'from datetime import date\n'
+        'from time import mktime'
+    )
 
     def __init__(self, *args, **kwargs):
+        kwargs['node_capacity'] = 10
         kwargs['key_format'] = 'I'
         super(DateIndex, self).__init__(*args, **kwargs)
 
@@ -30,8 +38,10 @@ class DateIndex(TreeBasedIndex):
         if date is None:
             return None
 
-        timestamp = data['timestamp'] = time.timegm(date.timetuple())
+        timestamp = data['timestamp'] = mktime(date.timetuple())
         return int(timestamp), None
 
     def make_key(self, key):
+        if isinstance(key, date):
+            return mktime(key.timetuple())
         return key
