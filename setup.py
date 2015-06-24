@@ -11,6 +11,6 @@ setup(
     packages=find_packages(),
     install_requires=(
         'Flask==0.10.1',
-        'CodernityDB==0.4.2'
+        'SQLAlchemy==1.0.5'
     )
 )

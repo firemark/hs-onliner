@@ -1,57 +1,55 @@
 from sqlalchemy import (
-    Column, Integer, String, Boolean, Datetime, Interval, Enum
-    relationship, func
+    Column, Integer, String, ForeignKey, DateTime, Date, Time, Text, func
 )
-from .db import Base
+from sqlalchemy.ext.declarative import declarative_base
+from hashlib import sha1
+from datetime import datetime
 
-def association_table(left, right):
-    return Table('%s-%s' % (left, right), Base.metadata,
-        Column('%s_id' % left, Integer, ForeignKey('%s.id' % left)),
-        Column('%s_id' % right, Integer, ForeignKey('%s.id' % right))
-    )
+Base = declarative_base()
 
 
 class Model(Base):
+    __abstract__ = True
     id = Column(Integer, primary_key=True)
-    time_add = Column(Datetime, default=func.now())
-    time_update = Column(Datetime, default=func.now())
+    time_add = Column(DateTime, default=func.now())
+    time_update = Column(DateTime, default=func.now(), onupdate=func.now())
 
 
-class Participant(Model):
+class User(Model):
     __tablename__ = 'users'
-    name = Column(String(100), unique=True)
-    telephone = Column(String(100))
-    email = Column(String(100))
+    name = Column(String(100), unique=True, nullable=False)
+    email = Column(String(100), unique=True, nullable=True)
+    pswd = Column(String(64), nullable=False)
 
-    def __init__(self, name=None):
-        self.name = name
-
-    def __repr__(self):
-        return 'User(%r)' % (self.name)
-
-
-class Place(Model):
-    __tablename__ = 'places'
-    name = Column(String(200), unique=True)
-    owners = relationship(
-                Participant,
-                secondary=association_table('places', 'participants')
-            )
-
-
-class ParticipantOnEvent(Base):
-    __tablename__='participants2events'
-    left_id = Column(Integer, ForeignKey('events.id'), primary_key=True)
-    right_id = Column(Integer, ForeignKey('participants.id'), primary_key=True)
-    time_will_arrive = Column(Datetime)
-    probability = Column(Integer)  # in percent
-    child = relationship(Participant)
+    def generate_password(self, pswd, salt=''):
+        self.pswd = sha1(salt + pswd).hexdigest()
 
 
 class Event(Model):
     __tablename__ = 'events'
-    topic = Column(String(200))
-    time_start = Column(Datetime)
-    period = Column(Interval)
-    place = ForeignKey(Place, backref='events')
-    participants = ForeignKey(ParticipantOnEvent)
+    topic = Column(String(100))
+    description = Column(Text)
+    date = Column(Date, index=True)
+    time_start = Column(Time)
+    time_end = Column(Time)
+
+
+class Participant(Model):
+    __tablename__ = 'participants'
+    WILL_BE_STATES = ('yes', 'probably', 'maybe')
+    name = Column(String(100), unique=True, nullable=True)
+    will_be = Column(String(10), nullable=False)
+    event = Column(Integer, ForeignKey('events.id'), nullable=False)
+    user = Column(Integer, ForeignKey('users.id'), nullable=False)
+
+
+class Token(Base):
+    __tablename__ = 'tokens'
+    hash = Column(String(64), nullable=False, primary_key=True)
+    user = Column(Integer, ForeignKey('users.id'), nullable=False)
+    expire_date = Column(DateTime, nullable=False)
+
+    def generate_hash(self, name=None):
+        name = self.user.name if name is not None else name
+        data = "{}_{}".format(datetime.now(), name)
+        self.hash = sha1(data).hexdigest()
