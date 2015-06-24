@@ -12,11 +12,18 @@ if __name__ == "__main__":
 
     if cmd == 'run-debug':
         from hsonliner.app import app
-        app.config.update(ENGINE=engine, SESSION=Session)
+        app.config.update(ENGINE=engine, SESSION=Session, SALT=cfg['salt'])
         app.run(debug=True)
     elif cmd == 'code':
         from code import interact
         from hsonliner.models import User, Event, Participant, Token
 
         interact(local=globals())
-
+    elif cmd == 'create-database':
+        create_database(engine)
+    elif cmd == 'create-user':
+        from hsonliner.models import User
+        with Session.scope() as session:
+            user = User(name=argv[2], email=argv[3])
+            user.generate_password(argv[4], salt=cfg['salt'])
+            session.add(user)

@@ -21,8 +21,12 @@ class User(Model):
     email = Column(String(100), unique=True, nullable=True)
     pswd = Column(String(64), nullable=False)
 
+    @staticmethod
+    def generate_hash(pswd, salt=''):
+        return sha1(salt + pswd).hexdigest()
+
     def generate_password(self, pswd, salt=''):
-        self.pswd = sha1(salt + pswd).hexdigest()
+        self.pswd = self.generate_hash(pswd, salt)
 
 
 class Event(Model):
