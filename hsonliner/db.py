@@ -9,7 +9,7 @@ def get_engine(uri):
 
 
 def get_session(engine):
-    Session = sessionmaker(bind=engine)
+    Session = sessionmaker(bind=engine, expire_on_commit=False)
     Session.scope = lambda: session_scope(Session)
     return Session
 

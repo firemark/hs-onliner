@@ -1,3 +1,5 @@
+from hsonliner.converters import DateConverter, TimeConverter
+
 from sqlalchemy import (
     Column, Integer, String, ForeignKey, DateTime, Date, Time, Text, func
 )
@@ -46,6 +48,15 @@ class Event(Model):
 
     participants = relationship('Participant', backref='event')
 
+    def to_dict(self):
+        return {
+            'description': self.description,
+            'topic': self.topic,
+            'date': DateConverter.to_url(self.date),
+            'time_start': TimeConverter.to_url(self.time_start),
+            'time_end': TimeConverter.to_url(self.time_end)
+        }
+
 
 class Participant(Model):
     __tablename__ = 'participants'
@@ -54,10 +65,17 @@ class Participant(Model):
         'p': 'probably',
         'm': 'maybe',
     }
+    REV_WILL_BE_STATES = {v: k for k,v in WILL_BE_STATES.items()}
     name = Column(String(100), unique=True, nullable=True)
     will_be = Column(String(1), nullable=False)
     event_id = Column(Integer, cascade_foreign_key('events.id'), nullable=False)
     user_id = Column(Integer, cascade_foreign_key('users.id'), nullable=False)
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'will_be': self.WILL_BE_STATES[self.will_be],
+        }
 
 
 class Token(Base):

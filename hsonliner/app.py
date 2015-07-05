@@ -1,5 +1,5 @@
 from hsonliner.models import User, Event, Participant, Token
-from hsonliner.converters import DateConverter
+from hsonliner.converters import DateConverter, TimeConverter
 
 from flask import Flask, abort, jsonify, request
 from datetime import datetime, timedelta
@@ -13,13 +13,21 @@ def session_scope():
     return app.config['SESSION'].scope()
 
 
-WILL_BE_STATES = ('yes', 'probably', 'maybe')
+def update_with_attrs(query, obj, converter=None, attrs=None):
+    attrs = attrs or []
+    for attr in attrs:
+        value = query.get(attr)
+        if value is None:
+            continue
+        if converter is not None:
+            value = converter.to_python(value)
+        setattr(obj, attr, value)
 
 
 def login_required(func):
 
     @wraps(func)
-    def inner(**kwargs):
+    def inner(*args, **kwargs):
         token_hash = request.headers.get('token')
 
         if token_hash is None:
@@ -29,13 +37,13 @@ def login_required(func):
             token = session.query(Token).get(token_hash)
             if token is None:
                 return 'token not found', 403
-            user = session.query(User).get(token.user)
+            user = session.query(User).get(token.user_id)
             if user is None:
                 return 'user not found', 403
             token.expire_date += timedelta(minutes=10)
             session.add(token)
 
-        return func(user, **kwargs)
+        return func(user, *args, **kwargs)
 
     return inner
 
@@ -60,7 +68,7 @@ def login(name):
 
     with session_scope() as session:
         session.add(token)
-        return jsonify({'token': token.hash})
+    return jsonify({'token': token.hash})
 
 
 @app.route("/<date:date>", methods=['GET'])
@@ -69,7 +77,7 @@ def get_event(date):
         event = session.query(Event).filter_by(date=date).scalar()
     if event is None:
         return 'event not found', 404
-    return jsonify(event)
+    return jsonify(event.to_dict())
 
 
 @app.route("/<date:date>", methods=['PUT', 'POST'])
@@ -78,69 +86,96 @@ def update_event(user, date):
     with session_scope() as session:
         event = session.query(Event).filter_by(date=date).scalar()
     if event is None:
-        return 'event not found', 404
-
-    query = request.json
-    data = {k: v for k, v in query.items() if v and k in ('name', 'desc')}
-    return 'lol', 500
-
-    if record is None:
         if request.method == 'PUT':
             return 'event not found', 404
-        data.update({
-            'date': date,
-            'users': {}
-        })
-        db.insert(data)
-    else:
-        record.update(data)
-        db.update(record)
-    return data, 201
-
-
-@app.route("/<date:date>/user/<string:name>", methods=['GET'])
-@login_required
-def get_user(date, name):
-    try:
-        record = db.get('days', date)
-    except RecordNotFound:
-        return 'day', 404
-    if name not in record['users']:
-        return 'user', 404
-
-    return jsonify(record)
-
-
-@app.route("/<date:date>/user/<string:name>", methods=['PUT', 'POST'])
-@login_required
-def update_user(date, name):
-    if request.headers['password-key'] != pwsd:
-        return 'wrong password', 403
-    try:
-        record = db.get('days', date)
-    except RecordNotFound:
-        return 'day', 404
+        event = Event(date=date)
 
     query = request.json
-    user = record['users'].get(name, {})
-    if request.method == 'PUT' and not user:
-        return 'user', 404
+    update_with_attrs(query, event, attrs=['topic', 'description'])
+    update_with_attrs(
+        query, event, converter=TimeConverter, attrs=['time_start', 'time_end']
+    )
 
-    if query.get('hour') not in xrange(1, 24 + 1):
-        return 'hour is invalid', 400
+    with session_scope() as session:
+        session.add(event)
+    return jsonify(event.to_dict())
 
-    if query.get('minutes') not in xrange(1, 60 + 1):
-        return 'minutes is invalid', 400
-
-    if query.get('state') not in WILL_BE_STATES:
-        return 'will_be state is invalid', 400
-
-    db.update(record)
-    return 201
-
-
+@app.route("/<date:date>", methods=['DELETE'])
 @login_required
-@app.route("/<date:past>/<date:pre>", methods=['GET'])
-def range_view(past, pre):
-    return jsonify(db.get_many('days', past=past, end=pre))
+def delete_event(user, date):
+    with session_scope() as session:
+        event = session.query(Event).filter_by(date=date).scalar()
+    if event is None:
+        return 'event not found', 404
 
+
+@app.route("/<date:past>/<date:pre>", methods=['GET'])
+def range_events(past, pre):
+    with session_scope() as session:
+        events = (
+            session.query(Event)
+            .filter(Event.date >= past, Event.date <= pre)
+        )
+    return jsonify({
+        'events': [event.to_dict() for event in events]
+    })
+
+
+@app.route("/<date:date>/participant/", methods=['GET'])
+def get_participants(date):
+    with session_scope() as session:
+        participants = (
+            session.query(Participant)
+            .join(Participant.event)
+            .filter(Event.date == date)
+        )
+    return jsonify({
+        'participants': [participant.to_dict() for participant in participants]
+    })
+
+
+@app.route("/<date:date>/participant/<string:name>", methods=['GET'])
+def get_participant(date, name):
+    with session_scope() as session:
+        participant = (
+            session.query(Participant)
+            .join(Participant.event)
+            .filter(Event.date == date, Participant.name == name)
+            .scalar()
+        )
+    if participant is None:
+        return 'participant not found', 404
+    return jsonify(participant.to_dict())
+
+
+@app.route("/<date:date>/participant/<string:name>", methods=['PUT', 'POST'])
+@login_required
+def update_participant(user, date, name):
+    with session_scope() as session:
+        participant = (
+            session.query(Participant)
+            .join(Participant.event)
+            .filter(Event.date == date, Participant.name == name)
+            .scalar()
+        )
+        if participant is None:
+            if request.method == 'PUT':
+                return 'participant not found', 404
+            event_id = session.query(Event.id).filter_by(date=date).scalar()
+            if event_id is None:
+                return 'event not found', 404
+            participant = Participant(
+                name=name,
+                event_id=event_id,
+                user_id=user.id
+            )
+
+        if participant.user_id != user.id:
+            return 'is not your participant, bastard!', 403
+
+    query = request.json
+    participant.will_be = Participant.REV_WILL_BE_STATES[query['will_be']]
+
+    with session_scope() as session:
+        session.add(participant)
+    return jsonify(participant.to_dict())
