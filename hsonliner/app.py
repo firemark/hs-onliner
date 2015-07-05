@@ -52,7 +52,7 @@ def login(name):
         return 'user not found', 404
 
     token = Token(
-        user=user_id,
+        user_id=user_id,
         expire_date=datetime.now() + timedelta(minutes=10)
     )
 
@@ -61,7 +61,6 @@ def login(name):
     with session_scope() as session:
         session.add(token)
         return jsonify({'token': token.hash})
-
 
 
 @app.route("/<date:date>", methods=['GET'])
