@@ -1,5 +1,5 @@
 from werkzeug.routing import BaseConverter, ValidationError
-from datetime import date
+from datetime import date, datetime
 
 class DateConverter(BaseConverter):
     date_format = "%d-%M-%Y"
@@ -7,7 +7,7 @@ class DateConverter(BaseConverter):
     @classmethod
     def to_python(cls, value):
         try:
-            return date.strptime(value, cls.date_format)
+            return datetime.strptime(value, cls.date_format).date()
         except ValueError:
             raise ValidationError()
 

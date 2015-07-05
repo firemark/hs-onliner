@@ -53,7 +53,6 @@ class Token(Base):
     user = Column(Integer, ForeignKey('users.id'), nullable=False)
     expire_date = Column(DateTime, nullable=False)
 
-    def generate_hash(self, name=None):
-        name = self.user.name if name is not None else name
+    def generate_hash(self, name):
         data = "{}_{}".format(datetime.now(), name)
         self.hash = sha1(data).hexdigest()
