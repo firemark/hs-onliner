@@ -100,6 +100,7 @@ def update_event(user, date):
         session.add(event)
     return jsonify(event.to_dict())
 
+
 @app.route("/<date:date>", methods=['DELETE'])
 @login_required
 def delete_event(user, date):
@@ -109,13 +110,19 @@ def delete_event(user, date):
         return 'event not found', 404
 
 
-@app.route("/<date:past>/<date:pre>", methods=['GET'])
-def range_events(past, pre):
+@app.route("/", methods=['GET'])
+def get_events():
+    args = request.args
+    from_date = DateConverter.get(args.get('from'))
+    to_date = DateConverter.get(args.get('to'))
+
     with session_scope() as session:
-        events = (
-            session.query(Event)
-            .filter(Event.date >= past, Event.date <= pre)
-        )
+        events = session.query(Event).order_by(Event.date.desc())
+        if from_date is not None:
+            events = events.filter(Event.date >= from_date )
+        if to_date is not None:
+            events = events.filter(Event.date <= to_date )
+        events = events.limit(30)
     return jsonify({
         'events': [event.to_dict() for event in events]
     })
