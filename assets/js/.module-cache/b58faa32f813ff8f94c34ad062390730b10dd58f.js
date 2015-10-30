@@ -50,9 +50,7 @@ var MainTemplate = React.createClass({displayName: "MainTemplate",
         );
     },
     render: function() {
-        var list = this.state.events.map(function (event) {
-            return React.createElement(EventTemplate, {event: event});
-        });
+        var list = this.state.events.map(this.renderElement);
         return React.createElement("ul", null, list);
     }
 });

@@ -15,21 +15,6 @@ var EventCollection = Backbone.Collection.extend({
     url: 'http:/localhost:5000/'
 });
 
-var EventTemplate = React.createClass({displayName: "EventTemplate",
-    render: function() {
-        var attrs = this.props.event.attributes;
-        return (
-            React.createElement("li", null, 
-                React.createElement("h1", null, attrs.topic), 
-                React.createElement("h2", null, attrs.date), 
-                React.createElement("p", null, attrs.description), 
-                React.createElement("time", null, React.createElement("strong", null, "Start:"), " ", attrs.time_start), 
-                React.createElement("time", null, React.createElement("strong", null, "End:"), " ", attrs.time_end)
-            )
-        );
-    }
-});
-
 var MainTemplate = React.createClass({displayName: "MainTemplate",
     getInitialState: function() {
         return {
@@ -50,16 +35,14 @@ var MainTemplate = React.createClass({displayName: "MainTemplate",
         );
     },
     render: function() {
-        var list = this.state.events.map(function (event) {
-            return React.createElement(EventTemplate, {event: event});
-        });
+        var list = this.state.events.map(this.renderElement);
         return React.createElement("ul", null, list);
     }
 });
 
 function init() {
     var template = ReactDOM.render(
-      React.createElement(MainTemplate, null),
+      React.createElement(EventsTemplate, null),
       document.getElementById('events')
     );
     var eventCollection = new EventCollection();
