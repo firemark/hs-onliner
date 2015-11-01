@@ -34,22 +34,41 @@ li.event > .date {
 
 li.event > .date > h2 { margin: 5px; }
 
-li.event > .main {
+.main {
     margin-left: 20px;
     display: inline-block;
 }
 
-li.event > .main >  h1 {
+.main >  h1 {
     margin: 0;
     width: 100%;
     font-size: 36pt;
 }
 
-li.event > .main >  h2 {
+.main >  h2 {
     margin: 0;
     width: 100%;
     font-size: 24pt;
 }
 
-li.event > .main > p {width: 100%;}
-li.event > .main > .info > time { margin-right: 5px; }
+main > p {width: 100%;}
+.main > .info > time { margin-right: 5px; }
+.participant {
+    display: inline;
+    color: white;
+    font-weight: bold;
+    padding: 0 8px;
+    border-radius: 15px;
+}
+
+.participant-yes {
+    background-color: #3AA655;
+}
+
+.participant-maybe {
+    background-color: #0066CC;
+}
+
+.participant-probably {
+    background-color: #FF681F;
+}

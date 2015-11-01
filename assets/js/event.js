@@ -1,5 +1,4 @@
 var Event = BaseModel.extend({
-    url: BASE_URL,
     idAttribute: 'date',
     defaults: {
         topic: '',
@@ -7,6 +6,11 @@ var Event = BaseModel.extend({
         date: '29-02-2000',
         time_start: '18:00',
         time_end: '24:00'
+    },
+
+    initialize: function () {
+        this.participants = new ParticipantCollection;
+        this.participants.event = this;
     }
 });
 

@@ -7,7 +7,9 @@ var MainTemplate = React.createClass({displayName: "MainTemplate",
     },
     render: function() {
         var list = this.state.events.map(function (event) {
-            return React.createElement(EventTemplate, {event: event});
+            return React.createElement(EventTemplate, {
+              key: event.attributes.date, 
+              event: event});
         });
         return React.createElement("ul", {id: "main"}, list);
     }
@@ -21,7 +23,6 @@ function init() {
     var eventCollection = new EventCollection();
     eventCollection.fetch({
         success: function () {
-            console.log(eventCollection.models);
             template.setState({events: eventCollection.models});
         }
     })

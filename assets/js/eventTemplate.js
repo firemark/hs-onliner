@@ -1,9 +1,15 @@
 var EventTemplate = React.createClass({displayName: "EventTemplate",
+    getInitialState: function() {
+        return {
+            participants: []
+        };
+    },
     render: function() {
         var attrs = this.props.event.attributes;
         var date = attrs.date.split('-');
+
         return (
-            React.createElement("li", {key: attrs.date, className: "event"}, 
+            React.createElement("li", {className: "event"}, 
                 React.createElement("div", {className: "date"}, 
                     React.createElement("h1", null, date[0], "-", date[1]), 
                     React.createElement("small", null, date[2])
@@ -21,10 +27,23 @@ var EventTemplate = React.createClass({displayName: "EventTemplate",
                         )
                     ), 
 
-                    React.createElement("p", null, attrs.description || '-')
+                    React.createElement("p", null, attrs.description || '-'), 
+                    React.createElement(ParticipantsTemplate, {participants: this.state.participants})
                 )
+
 
             )
         );
+    },
+    componentWillMount: function () {
+        var self = this;
+        var partCol = self.props.event.participants;
+        if (partCol.length == 0) {
+            partCol.fetch({
+                success: function () {
+                    self.setState({participants: partCol.models});
+                }
+            })
+        }
     }
 });
