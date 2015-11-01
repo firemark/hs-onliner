@@ -1,9 +1,11 @@
 from hsonliner.models import User, Event, Participant, Token
 from hsonliner.converters import DateConverter, TimeConverter
 
-from flask import Flask, abort, jsonify, request
+from flask import Flask, jsonify, request, Response
 from datetime import datetime, timedelta
 from functools import wraps
+
+from sqlalchemy import func
 
 app = Flask(__name__)
 app.url_map.converters['date'] = DateConverter
@@ -24,22 +26,41 @@ def update_with_attrs(query, obj, converter=None, attrs=None):
         setattr(obj, attr, value)
 
 
+def authenticate():
+    """
+        Sends a 401 response that enables basic auth
+        from http://flask.pocoo.org/snippets/8/
+    """
+
+    return Response(
+        response=(
+            'Could not verify your access level for that URL.\n'
+            'You have to login with proper credentials',
+        ),
+        status=401,
+        headers={'WWW-Authenticate': 'Basic realm="Token Required"'}
+    )
+
+
 def login_required(func):
 
     @wraps(func)
     def inner(*args, **kwargs):
-        token_hash = request.headers.get('token')
+        auth = request.authorization
 
-        if token_hash is None:
-            return 'token not found', 403
+        if not auth:
+            return authenticate()
+
+        token_hash = auth.password
+        user_id = auth.username
 
         with session_scope() as session:
-            token = session.query(Token).get(token_hash)
+            token = session.query(Token).get(hash=token_hash, user_id=user_id)
             if token is None:
-                return 'token not found', 403
+                return authenticate()
             user = session.query(User).get(token.user_id)
             if user is None:
-                return 'user not found', 403
+                return authenticate()
             token.expire_date += timedelta(minutes=10)
             session.add(token)
 
@@ -68,7 +89,8 @@ def login(name):
 
     with session_scope() as session:
         session.add(token)
-    return jsonify({'token': token.hash})
+
+    return jsonify({'user': user_id, 'token': token.hash})
 
 
 @app.route("/<date:date>", methods=['GET'])
@@ -139,7 +161,7 @@ def get_participants(date):
             .filter(Event.date == date)
         )
     return jsonify({
-        'participants': [participant.to_dict() for participant in participants]
+        'results': [participant.to_dict() for participant in participants]
     })
 
 
