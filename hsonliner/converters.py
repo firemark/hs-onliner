@@ -25,7 +25,7 @@ class DateConverter(BaseConverter):
 
 
 class TimeConverter(BaseConverter):
-    time_format = "%H-%M"
+    time_format = "%H:%M"
 
     @classmethod
     def to_python(cls, value):

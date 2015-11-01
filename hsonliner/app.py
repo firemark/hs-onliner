@@ -93,7 +93,9 @@ def update_event(user, date):
     query = request.json
     update_with_attrs(query, event, attrs=['topic', 'description'])
     update_with_attrs(
-        query, event, converter=TimeConverter, attrs=['time_start', 'time_end']
+        query, event,
+        converter=TimeConverter,
+        attrs=['time_start', 'time_end']
     )
 
     with session_scope() as session:
@@ -119,12 +121,12 @@ def get_events():
     with session_scope() as session:
         events = session.query(Event).order_by(Event.date.desc())
         if from_date is not None:
-            events = events.filter(Event.date >= from_date )
+            events = events.filter(Event.date >= from_date)
         if to_date is not None:
-            events = events.filter(Event.date <= to_date )
+            events = events.filter(Event.date <= to_date)
         events = events.limit(30)
     return jsonify({
-        'events': [event.to_dict() for event in events]
+        'results': [event.to_dict() for event in events]
     })
 
 

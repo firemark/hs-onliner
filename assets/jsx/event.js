@@ -1,5 +1,5 @@
-var Event = Backbone.Model.extend({
-    urlRoot: '/',
+var Event = BaseModel.extend({
+    url: BASE_URL,
     idAttribute: 'date',
     defaults: {
         topic: '',
@@ -10,62 +10,7 @@ var Event = Backbone.Model.extend({
     }
 });
 
-var EventCollection = Backbone.Collection.extend({
+var EventCollection = BaseCollection.extend({
     model: Event,
-    url: 'http:/localhost:5000/'
+    url: BASE_URL
 });
-
-var EventTemplate = React.createClass({
-    render: function() {
-        var attrs = this.props.event.attributes;
-        return (
-            <li>
-                <h1>{attrs.topic}</h1>
-                <h2>{attrs.date}</h2>
-                <p>{attrs.description}</p>
-                <time><strong>Start:</strong> {attrs.time_start}</time>
-                <time><strong>End:</strong> {attrs.time_end}</time>
-            </li>
-        );
-    }
-});
-
-var MainTemplate = React.createClass({
-    getInitialState: function() {
-        return {
-            events: [],
-            username: null
-        };
-    },
-    renderElement: function(event) {
-        var attrs = event.attributes;
-        return (
-            <li>
-                <h1>{attrs.topic}</h1>
-                <h2>{attrs.date}</h2>
-                <p>{attrs.description}</p>
-                <time><strong>Start:</strong> {attrs.time_start}</time>
-                <time><strong>End:</strong> {attrs.time_end}</time>
-            </li>
-        );
-    },
-    render: function() {
-        var list = this.state.events.map(function (event) {
-            return <EventTemplate event={event} />;
-        });
-        return <ul>{list}</ul>;
-    }
-});
-
-function init() {
-    var template = ReactDOM.render(
-      <MainTemplate />,
-      document.getElementById('events')
-    );
-    var eventCollection = new EventCollection();
-    eventCollection.fetch({
-        success: function () {
-            template.setState({events: eventCollection.models});
-        }
-    })
-}

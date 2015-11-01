@@ -13,7 +13,7 @@ if __name__ == "__main__":
     if cmd == 'run-debug':
         from hsonliner.app import app
         app.config.update(ENGINE=engine, SESSION=Session, SALT=cfg['salt'])
-        app.run(debug=True)
+        app.run(debug=True, host='0.0.0.0', port=9005)
     elif cmd == 'code':
         from code import interact
         from hsonliner.models import User, Event, Participant, Token

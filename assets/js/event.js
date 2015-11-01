@@ -1,5 +1,5 @@
-var Event = Backbone.Model.extend({
-    urlRoot: '/',
+var Event = BaseModel.extend({
+    url: BASE_URL,
     idAttribute: 'date',
     defaults: {
         topic: '',
@@ -10,62 +10,7 @@ var Event = Backbone.Model.extend({
     }
 });
 
-var EventCollection = Backbone.Collection.extend({
+var EventCollection = BaseCollection.extend({
     model: Event,
-    url: 'http:/localhost:5000/'
+    url: BASE_URL
 });
-
-var EventTemplate = React.createClass({displayName: "EventTemplate",
-    render: function() {
-        var attrs = this.props.event.attributes;
-        return (
-            React.createElement("li", null, 
-                React.createElement("h1", null, attrs.topic), 
-                React.createElement("h2", null, attrs.date), 
-                React.createElement("p", null, attrs.description), 
-                React.createElement("time", null, React.createElement("strong", null, "Start:"), " ", attrs.time_start), 
-                React.createElement("time", null, React.createElement("strong", null, "End:"), " ", attrs.time_end)
-            )
-        );
-    }
-});
-
-var MainTemplate = React.createClass({displayName: "MainTemplate",
-    getInitialState: function() {
-        return {
-            events: [],
-            username: null
-        };
-    },
-    renderElement: function(event) {
-        var attrs = event.attributes;
-        return (
-            React.createElement("li", null, 
-                React.createElement("h1", null, attrs.topic), 
-                React.createElement("h2", null, attrs.date), 
-                React.createElement("p", null, attrs.description), 
-                React.createElement("time", null, React.createElement("strong", null, "Start:"), " ", attrs.time_start), 
-                React.createElement("time", null, React.createElement("strong", null, "End:"), " ", attrs.time_end)
-            )
-        );
-    },
-    render: function() {
-        var list = this.state.events.map(function (event) {
-            return React.createElement(EventTemplate, {event: event});
-        });
-        return React.createElement("ul", null, list);
-    }
-});
-
-function init() {
-    var template = ReactDOM.render(
-      React.createElement(MainTemplate, null),
-      document.getElementById('events')
-    );
-    var eventCollection = new EventCollection();
-    eventCollection.fetch({
-        success: function () {
-            template.setState({events: eventCollection.models});
-        }
-    })
-}
