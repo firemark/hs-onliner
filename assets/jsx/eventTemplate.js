@@ -30,17 +30,17 @@ var EventTemplate = React.createClass({
                     <p>{attrs.description || '-'}</p>
                     <ParticipantsTemplate participants={this.state.participants} />
                 </div>
-
-
             </li>
         );
     },
     componentWillMount: function () {
         var self = this;
         var partCol = self.props.event.participants;
-        if (partCol.length == 0) {
+        console.log(partCol.isUpdated)
+        if (!partCol.isUpdated) {
             partCol.fetch({
                 success: function () {
+                    partCol.isUpdated = true;
                     self.setState({participants: partCol.models});
                 }
             })

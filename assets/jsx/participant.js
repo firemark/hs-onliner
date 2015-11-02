@@ -9,6 +9,6 @@ var Participant = BaseModel.extend({
 var ParticipantCollection = BaseCollection.extend({
     model: Participant,
     url: function () {
-        return this.event.url() + '/participant/';
+        return this.event.url() + '/participant';
     }
 });
