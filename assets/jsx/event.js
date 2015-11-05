@@ -11,6 +11,7 @@ var Event = BaseModel.extend({
     initialize: function () {
         this.participants = new ParticipantCollection;
         this.participants.event = this;
+        this.participants.fetch();
     }
 });
 

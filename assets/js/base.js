@@ -4,12 +4,17 @@ var BaseCollection = Backbone.Collection.extend({
         return data.results;
     },
     initialize: function () {
-      this.isUpdated = false;
+        this.isUpdated = false;
+    },
+    sync: function(method, model, options) {
+        console.log(method);
+        console.log(model);
+        return Backbone.sync.call(this, method, model, options);
     }
 });
 
 var BaseModel = Backbone.Model.extend({
     initialize: function () {
-      this.isUpdated = false;
+        this.isUpdated = false;
     }
 });

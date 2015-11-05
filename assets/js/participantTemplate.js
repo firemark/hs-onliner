@@ -13,7 +13,11 @@ var ParticipantTemplate = React.createClass({displayName: "ParticipantTemplate",
 
 var ParticipantsTemplate = React.createClass({displayName: "ParticipantsTemplate",
     render: function() {
-        var parts = this.props.participants || [];
+        var parts = this.props.participants;
+        if (!parts) {
+            return React.createElement("div", {className: "participants"});
+        }
+
 
         var RenderedParts = parts.map(function (participant){
             return React.createElement(ParticipantTemplate, {

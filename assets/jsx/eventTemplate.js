@@ -35,15 +35,8 @@ var EventTemplate = React.createClass({
     },
     componentWillMount: function () {
         var self = this;
-        var partCol = self.props.event.participants;
-        console.log(partCol.isUpdated)
-        if (!partCol.isUpdated) {
-            partCol.fetch({
-                success: function () {
-                    partCol.isUpdated = true;
-                    self.setState({participants: partCol.models});
-                }
-            })
-        }
+        self.props.event.participants.on("update", function (participants) {
+            self.setState({participants: participants.models});
+        });
     }
 });
