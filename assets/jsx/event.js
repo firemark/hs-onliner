@@ -1,4 +1,4 @@
-var Event = BaseModel.extend({
+var EventModel = BaseModel.extend({
     idAttribute: 'date',
     defaults: {
         topic: '',
@@ -16,6 +16,6 @@ var Event = BaseModel.extend({
 });
 
 var EventCollection = BaseCollection.extend({
-    model: Event,
+    model: EventModel,
     url: BASE_URL
 });

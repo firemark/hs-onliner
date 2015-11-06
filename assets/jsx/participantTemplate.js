@@ -18,12 +18,12 @@ var ParticipantsTemplate = React.createClass({
             return <div className='participants'></div>;
         }
 
-
         var RenderedParts = parts.map(function (participant){
             return <ParticipantTemplate
               key={participant.attributes.name}
               participant={participant} />
         });
+
         return (
             <div className='participants'>
                 <span>Total: {parts.length}</span>

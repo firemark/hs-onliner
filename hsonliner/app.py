@@ -69,9 +69,9 @@ def login_required(func):
     return inner
 
 
-@app.route("/login/<string:name>", methods=['POST'])
+@app.route("/login/<string:name>", methods=['PATCH'])
 def login(name):
-    raw_pwsd = request.stream.read()
+    raw_pwsd = request.json['password']
     pswd = User.generate_hash(raw_pwsd, app.config['SALT'])
     with session_scope() as session:
         user_id = (session.query(User.id)

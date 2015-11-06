@@ -1,17 +1,25 @@
 var MainTemplate = React.createClass({displayName: "MainTemplate",
-    getInitialState: function() {
+    getInitialState: function () {
         return {
             events: [],
-            username: null
+            login: null
         };
     },
-    render: function() {
+    render: function () {
+        var is_logged = this.state.login !== null;
+        console.log(this.state.events);
         var list = this.state.events.map(function (event) {
             return React.createElement(EventTemplate, {
-              key: event.attributes.date, 
-              event: event});
+                key: event.attributes.date, 
+                event: event, 
+                is_logged: is_logged});
         });
-        return React.createElement("ul", {id: "main"}, list);
+        return (
+          React.createElement("div", null, 
+            React.createElement(LoginTemplate, {is_logged: is_logged}), 
+            React.createElement("ul", {id: "main"}, list)
+          )
+        );
     }
 });
 
@@ -20,10 +28,16 @@ function init() {
       React.createElement(MainTemplate, null),
       document.getElementById('events')
     );
-    var eventCollection = new EventCollection();
+    var eventCollection = new EventCollection;
     eventCollection.fetch({
         success: function () {
             template.setState({events: eventCollection.models});
         }
-    })
+    });
+    session.on('sync', function () {
+       template.setState({
+           login: session.get('login')
+       })
+    });
+
 }
