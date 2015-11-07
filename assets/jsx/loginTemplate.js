@@ -7,7 +7,7 @@ var LoginTemplate = React.createClass({
     },
     render: function () {
         if(this.props.is_logged)
-            return <div className='login block'>You are logged as {this.state.login}</div>;
+            return <div className='login block center'>You are logged as {this.state.login}</div>;
 
         return (
           <form className='login block' onSubmit={this.login}>
@@ -17,7 +17,7 @@ var LoginTemplate = React.createClass({
               </div>
               <div>
                   <label>Password</label>
-                  <input type='text' value={this.state.password} onChange={this.changeInput('password')} />
+                  <input type='password' value={this.state.password} onChange={this.changeInput('password')} />
               </div>
 
               <button>Login</button>

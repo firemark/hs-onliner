@@ -7,7 +7,7 @@ var LoginTemplate = React.createClass({displayName: "LoginTemplate",
     },
     render: function () {
         if(this.props.is_logged)
-            return React.createElement("div", {className: "login block"}, "You are logged as ", this.state.login);
+            return React.createElement("div", {className: "login block center"}, "You are logged as ", this.state.login);
 
         return (
           React.createElement("form", {className: "login block", onSubmit: this.login}, 
@@ -17,7 +17,7 @@ var LoginTemplate = React.createClass({displayName: "LoginTemplate",
               ), 
               React.createElement("div", null, 
                   React.createElement("label", null, "Password"), 
-                  React.createElement("input", {type: "text", value: this.state.password, onChange: this.changeInput('password')})
+                  React.createElement("input", {type: "password", value: this.state.password, onChange: this.changeInput('password')})
               ), 
 
               React.createElement("button", null, "Login")

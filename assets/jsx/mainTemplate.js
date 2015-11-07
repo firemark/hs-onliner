@@ -7,17 +7,27 @@ var MainTemplate = React.createClass({
     },
     render: function () {
         var is_logged = this.state.login !== null;
-        console.log(this.state.events);
         var list = this.state.events.map(function (event) {
             return <EventTemplate
                 key={event.attributes.date}
                 event={event}
                 is_logged={is_logged} />;
         });
+
+        var add_event = '';
+        if (is_logged) {
+            add_event = (
+              <div className='block add-event'>
+                add event
+              </div>
+            );
+        }
+
         return (
           <div>
-            <LoginTemplate is_logged={is_logged} />
-            <ul id='main'>{list}</ul>
+              <LoginTemplate is_logged={is_logged} />
+              {add_event}
+              <ul id='main'>{list}</ul>
           </div>
         );
     }

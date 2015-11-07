@@ -8,6 +8,11 @@ var EventTemplate = React.createClass({
         var attrs = this.props.event.attributes;
         var date = attrs.date.split('-');
 
+        var edit_button = '';
+        if (this.props.is_logged) {
+            edit_button = <button className="edit-event">✎</button>;
+        }
+
         return (
             <li className='event block'>
                 <div className='date'>
@@ -15,7 +20,10 @@ var EventTemplate = React.createClass({
                     <small>{date[2]}</small>
                 </div>
                 <div className='main'>
-                    <h1>{attrs.topic || 'general event'}</h1>
+                    <h1>
+                        {attrs.topic || 'general event'}
+                        {edit_button}
+                    </h1>
                     <div className='info'>
                         <time className='start'>
                             <strong>Start: </strong>
@@ -35,6 +43,7 @@ var EventTemplate = React.createClass({
     },
     componentWillMount: function () {
         var self = this;
+        console.log('mount');
         self.props.event.participants.on("update", function (participants) {
             self.setState({participants: participants.models});
         });

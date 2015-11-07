@@ -8,6 +8,11 @@ var EventTemplate = React.createClass({displayName: "EventTemplate",
         var attrs = this.props.event.attributes;
         var date = attrs.date.split('-');
 
+        var edit_button = '';
+        if (this.props.is_logged) {
+            edit_button = React.createElement("button", {className: "edit-event"}, "✎");
+        }
+
         return (
             React.createElement("li", {className: "event block"}, 
                 React.createElement("div", {className: "date"}, 
@@ -15,7 +20,10 @@ var EventTemplate = React.createClass({displayName: "EventTemplate",
                     React.createElement("small", null, date[2])
                 ), 
                 React.createElement("div", {className: "main"}, 
-                    React.createElement("h1", null, attrs.topic || 'general event'), 
+                    React.createElement("h1", null, 
+                        attrs.topic || 'general event', 
+                        edit_button
+                    ), 
                     React.createElement("div", {className: "info"}, 
                         React.createElement("time", {className: "start"}, 
                             React.createElement("strong", null, "Start: "), 
@@ -35,6 +43,7 @@ var EventTemplate = React.createClass({displayName: "EventTemplate",
     },
     componentWillMount: function () {
         var self = this;
+        console.log('mount');
         self.props.event.participants.on("update", function (participants) {
             self.setState({participants: participants.models});
         });
