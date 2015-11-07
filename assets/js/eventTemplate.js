@@ -9,7 +9,7 @@ var EventTemplate = React.createClass({displayName: "EventTemplate",
         var date = attrs.date.split('-');
 
         return (
-            React.createElement("li", {className: "event"}, 
+            React.createElement("li", {className: "event block"}, 
                 React.createElement("div", {className: "date"}, 
                     React.createElement("h1", null, date[0], "-", date[1]), 
                     React.createElement("small", null, date[2])

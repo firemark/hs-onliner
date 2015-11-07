@@ -7,12 +7,19 @@ var LoginTemplate = React.createClass({
     },
     render: function () {
         if(this.props.is_logged)
-            return <div className='login-info'>You are logged as {this.state.login}</div>;
+            return <div className='login block'>You are logged as {this.state.login}</div>;
 
         return (
-          <form className='login' onSubmit={this.login}>
-              <input type='text' value={this.state.login} onChange={this.changeInput('login')} />
-              <input type='text' value={this.state.password} onChange={this.changeInput('password')} />
+          <form className='login block' onSubmit={this.login}>
+              <div>
+                  <label>Login</label>
+                  <input type='text' value={this.state.login} onChange={this.changeInput('login')} />
+              </div>
+              <div>
+                  <label>Password</label>
+                  <input type='text' value={this.state.password} onChange={this.changeInput('password')} />
+              </div>
+
               <button>Login</button>
           </form>
         );
@@ -27,7 +34,6 @@ var LoginTemplate = React.createClass({
     login: function (ev) {
         ev.preventDefault();
         session.set({login: this.state.login});
-        console.log(session.isNew());
         session.save({password: this.state.password}, {patch: true});
         this.setState({
             'password': ''
