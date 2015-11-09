@@ -133,8 +133,8 @@ def update_event(user, date):
 @login_required
 def delete_event(user, date):
     with session_scope() as session:
-        event = session.query(Event).filter_by(date=date).scalar()
-    if event is None:
+        count = session.query(Event).filter_by(date=date).delete()
+    if count == 0:
         return 'event not found', 404
 
 
@@ -181,6 +181,22 @@ def get_participant(date, name):
     if participant is None:
         return 'participant not found', 404
     return jsonify(participant.to_dict())
+
+@app.route("/<date:date>/participant/<string:name>", methods=['DELETE'])
+@login_required
+def delete_participant(user, date, name):
+    with session_scope() as session:
+        participant_id = (
+            session.query(Participant.id)
+            .join(Participant.event)
+            .filter(Event.date == date, Participant.name == name)
+            .scalar()
+        )
+        if participant_id is None:
+            return 'event not found', 404
+        session.query(Participant).filter_by(id=participant_id).delete()
+        return '', 200
+
 
 
 @app.route("/<date:date>/participant/<string:name>", methods=['PUT', 'POST'])

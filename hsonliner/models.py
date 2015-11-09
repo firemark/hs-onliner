@@ -1,8 +1,8 @@
 from hsonliner.converters import DateConverter, TimeConverter
 
 from sqlalchemy import (
-    Column, Integer, String, ForeignKey, DateTime, Date, Time, Text, func
-)
+    Column, Integer, String, ForeignKey, DateTime, Date, Time, Text, func,
+    ForeignKeyConstraint)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from hashlib import sha1
@@ -66,10 +66,15 @@ class Participant(Model):
         'm': 'maybe',
     }
     REV_WILL_BE_STATES = {v: k for k,v in WILL_BE_STATES.items()}
-    name = Column(String(100), unique=True, nullable=True)
+    name = Column(String(100), nullable=False)
     will_be = Column(String(1), nullable=False)
     event_id = Column(Integer, cascade_foreign_key('events.id'), nullable=False)
     user_id = Column(Integer, cascade_foreign_key('users.id'), nullable=False)
+
+    fk_participant = ForeignKeyConstraint(
+        ['name', 'event_id'],
+        ['participant.name', 'participant.event_id']
+    )
 
     def to_dict(self):
         return {

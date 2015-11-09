@@ -43,9 +43,8 @@ var EventTemplate = React.createClass({displayName: "EventTemplate",
         );
     },
     componentWillMount: function () {
-        var self = this;
-        self.props.event.participants.on("sync", function (participants) {
-            self.setState({participants: participants});
-        });
+        this.props.event.participants.on("update", function (participants) {
+            this.setState({participants: participants});
+        }.bind(this));
     }
 });

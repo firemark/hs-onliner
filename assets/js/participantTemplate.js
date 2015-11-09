@@ -2,13 +2,14 @@ var ParticipantTemplate = React.createClass({displayName: "ParticipantTemplate",
     getInitialState: function () {
         return {
             name: '',
-            will_be: 'yes'
+            will_be: 'yes',
+            isEditable: false
         };
     },
     render: function() {
         var attrs = this.props.participant.attributes;
         var is_logged = this.props.is_logged;
-        var isNew = this.props.participant.isNew();
+        var isNew = this.state.isEditable;
         var will_be = isNew? this.state.will_be : attrs.will_be;
         var className = 'participant participant-' + will_be;
         return (
@@ -21,7 +22,7 @@ var ParticipantTemplate = React.createClass({displayName: "ParticipantTemplate",
                     React.createElement("button", {onClick: this.add}, "✔")
                 ), 
                 React.createElement(If, {cond: is_logged}, 
-                    React.createElement("button", {className: "del", onClick: this.props.del}, "❌")
+                    React.createElement("button", {className: "del", onClick: this.del}, "❌")
                 )
             )
         );
@@ -33,11 +34,21 @@ var ParticipantTemplate = React.createClass({displayName: "ParticipantTemplate",
         var participant = this.props.participant;
         var isNew = participant.isNew();
         participant.set(this.state);
-        participant.save(null, {type: isNew? 'POST' : 'PUT'}, function () {
-            this.forceUpdate();
-            this.replaceState({});
-        }.bind(this));
-
+        participant.save(null, {
+            type: isNew? 'POST' : 'PUT',
+            success: function () {
+                this.setState(this.getInitialState());
+            }.bind(this),
+            error: function () {
+                participant.clear();
+            }.bind(this)
+        });
+    },
+    del: function () {
+        this.props.participant.destroy();
+    },
+    componentWillMount: function () {
+        this.setState({isEditable: this.props.participant.isNew()})
     }
 });
 
@@ -49,12 +60,10 @@ var ParticipantsTemplate = React.createClass({displayName: "ParticipantsTemplate
         if (!parts)
             return React.createElement("div", {className: "participants"});
 
-        var delGenerator = this.delGenerator;
 
         var RenderedParts = parts.map(function (participant){
             return React.createElement(ParticipantTemplate, {
               key: participant.attributes.name, 
-              del: delGenerator(participant), 
               participant: participant, 
               is_logged: is_logged})
         });
@@ -75,12 +84,5 @@ var ParticipantsTemplate = React.createClass({displayName: "ParticipantsTemplate
     },
     addParticipant: function () {
         this.props.participants.add([{}]);
-        this.forceUpdate();
-    },
-    delGenerator: function (participant) {
-        return function () {
-            participant.destroy();
-            this.forceUpdate();
-        }.bind(this);
     }
 });
