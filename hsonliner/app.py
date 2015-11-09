@@ -47,7 +47,6 @@ def login_required(func):
     @wraps(func)
     def inner(*args, **kwargs):
         auth = request.authorization
-
         if not auth:
             return authenticate()
 
@@ -55,7 +54,12 @@ def login_required(func):
         user_id = auth.username
 
         with session_scope() as session:
-            token = session.query(Token).get(hash=token_hash, user_id=user_id)
+            token = (
+                session.query(Token)
+                .filter(Token.hash==token_hash)
+                .filter(Token.user_id==user_id)
+                .scalar()
+            )
             if token is None:
                 return authenticate()
             user = session.query(User).get(token.user_id)
@@ -90,7 +94,7 @@ def login(name):
     with session_scope() as session:
         session.add(token)
 
-    return jsonify({'user': user_id, 'token': token.hash})
+    return jsonify({'id': user_id, 'token': token.hash})
 
 
 @app.route("/<date:date>", methods=['GET'])
