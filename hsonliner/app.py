@@ -201,11 +201,14 @@ def update_participant(user, date, name):
                 user_id=user.id
             )
 
-        if participant.user_id != user.id:
-            return 'is not your participant, bastard!', 403
+        #if participant.user_id != user.id:
+        #    return 'is not your participant, bastard!', 403
 
     query = request.json
-    participant.will_be = Participant.REV_WILL_BE_STATES[query['will_be']]
+    try:
+        participant.will_be = Participant.REV_WILL_BE_STATES[query['will_be']]
+    except KeyError:
+        return 'will_be value is not correct', 400
 
     with session_scope() as session:
         session.add(participant)

@@ -1,8 +1,8 @@
 var Participant = BaseModel.extend({
     idAttribute: 'name',
     defaults: {
-        name: '',
-        will_be: ''
+        name: null,
+        will_be: 'yes'
     }
 });
 

@@ -1,17 +1,14 @@
 var EventTemplate = React.createClass({displayName: "EventTemplate",
     getInitialState: function() {
         return {
-            participants: []
+            participants: [],
+            editable: false
         };
     },
     render: function() {
         var attrs = this.props.event.attributes;
+        var is_logged = this.props.is_logged;
         var date = attrs.date.split('-');
-
-        var edit_button = '';
-        if (this.props.is_logged) {
-            edit_button = React.createElement("button", {className: "edit-event"}, "✎");
-        }
 
         return (
             React.createElement("li", {className: "event block"}, 
@@ -22,7 +19,9 @@ var EventTemplate = React.createClass({displayName: "EventTemplate",
                 React.createElement("div", {className: "main"}, 
                     React.createElement("h1", null, 
                         attrs.topic || 'general event', 
-                        edit_button
+                        React.createElement(If, {cond: is_logged}, 
+                            React.createElement("button", {className: "edit-event"}, "✎")
+                        )
                     ), 
                     React.createElement("div", {className: "info"}, 
                         React.createElement("time", {className: "start"}, 
@@ -36,16 +35,17 @@ var EventTemplate = React.createClass({displayName: "EventTemplate",
                     ), 
 
                     React.createElement("p", null, attrs.description || '-'), 
-                    React.createElement(ParticipantsTemplate, {participants: this.state.participants})
+                    React.createElement(ParticipantsTemplate, {
+                      participants: this.state.participants, 
+                      is_logged: is_logged})
                 )
             )
         );
     },
     componentWillMount: function () {
         var self = this;
-        console.log('mount');
-        self.props.event.participants.on("update", function (participants) {
-            self.setState({participants: participants.models});
+        self.props.event.participants.on("sync", function (participants) {
+            self.setState({participants: participants});
         });
     }
 });

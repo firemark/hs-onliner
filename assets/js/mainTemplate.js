@@ -13,20 +13,14 @@ var MainTemplate = React.createClass({displayName: "MainTemplate",
                 event: event, 
                 is_logged: is_logged});
         });
-
-        var add_event = '';
-        if (is_logged) {
-            add_event = (
-              React.createElement("div", {className: "block add-event"}, 
-                "add event"
-              )
-            );
-        }
-
         return (
           React.createElement("div", null, 
               React.createElement(LoginTemplate, {is_logged: is_logged}), 
-              add_event, 
+              React.createElement(If, {cond: is_logged}, 
+                  React.createElement("div", {className: "block add-event"}, 
+                    React.createElement("button", null, "add event")
+                  )
+              ), 
               React.createElement("ul", {id: "main"}, list)
           )
         );

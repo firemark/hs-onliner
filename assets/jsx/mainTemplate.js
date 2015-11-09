@@ -13,20 +13,14 @@ var MainTemplate = React.createClass({
                 event={event}
                 is_logged={is_logged} />;
         });
-
-        var add_event = '';
-        if (is_logged) {
-            add_event = (
-              <div className='block add-event'>
-                add event
-              </div>
-            );
-        }
-
         return (
           <div>
               <LoginTemplate is_logged={is_logged} />
-              {add_event}
+              <If cond={is_logged}>
+                  <div className='block add-event'>
+                    <button>add event</button>
+                  </div>
+              </If>
               <ul id='main'>{list}</ul>
           </div>
         );

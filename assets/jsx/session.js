@@ -1,4 +1,4 @@
-var Session = BaseModel.extend({
+var Session = Backbone.Model.extend({
     urlRoot: BASE_URL + '/login',
     idAttribute: 'login',
     defaults: {

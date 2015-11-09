@@ -1,17 +1,14 @@
 var EventTemplate = React.createClass({
     getInitialState: function() {
         return {
-            participants: []
+            participants: [],
+            editable: false
         };
     },
     render: function() {
         var attrs = this.props.event.attributes;
+        var is_logged = this.props.is_logged;
         var date = attrs.date.split('-');
-
-        var edit_button = '';
-        if (this.props.is_logged) {
-            edit_button = <button className="edit-event">✎</button>;
-        }
 
         return (
             <li className='event block'>
@@ -22,7 +19,9 @@ var EventTemplate = React.createClass({
                 <div className='main'>
                     <h1>
                         {attrs.topic || 'general event'}
-                        {edit_button}
+                        <If cond={is_logged}>
+                            <button className="edit-event">✎</button>
+                        </If>
                     </h1>
                     <div className='info'>
                         <time className='start'>
@@ -36,16 +35,17 @@ var EventTemplate = React.createClass({
                     </div>
 
                     <p>{attrs.description || '-'}</p>
-                    <ParticipantsTemplate participants={this.state.participants} />
+                    <ParticipantsTemplate
+                      participants={this.state.participants}
+                      is_logged={is_logged} />
                 </div>
             </li>
         );
     },
     componentWillMount: function () {
         var self = this;
-        console.log('mount');
-        self.props.event.participants.on("update", function (participants) {
-            self.setState({participants: participants.models});
+        self.props.event.participants.on("sync", function (participants) {
+            self.setState({participants: participants});
         });
     }
 });

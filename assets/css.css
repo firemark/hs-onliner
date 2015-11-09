@@ -79,12 +79,33 @@ li.event > .date > h2 { margin: 5px; }
 
 .main > p {width: 100%;}
 .main > .info > time { margin-right: 5px; }
-.participant {
+.participants > ul {
+    display: block;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+.participants > ul li {
     display: inline;
     color: white;
     font-weight: bold;
-    padding: 0 8px;
+    padding: 2px 8px;
     border-radius: 15px;
+}
+
+.participants > ul button {
+    padding: 2px;
+    margin: 5px;
+}
+
+.participants > ul input {
+    background: none;
+    font-weight: bold;
+    border: 2px solid white;
+    border-radius: 5px;
+    color: white;
+    padding: 2px;
+    margin: 5px;
 }
 
 .participant-yes {
@@ -99,12 +120,45 @@ li.event > .date > h2 { margin: 5px; }
     background-color: #FF681F;
 }
 
-.edit-event {
-    float: right;
+button {
     background-color: #4997D0;
     color: white;
-    border: 1px #0066CC;
-    font-size: 20pt;
+    border: 1px #3b7ba8 solid;
     border-radius: 5px;
     box-shadow: 0 0 2px 1px #A9B2C3;
+}
+
+button:hover {
+    background-color: #3b7ba8;
+}
+
+button:active {
+    background-color: #45add8;
+}
+
+button.del {
+    background-color: #d04948;
+    border-color: #a84a45;
+    box-shadow: 0 0 2px 1px #c39394;
+}
+
+button.del:hover {
+    background-color: #a84a45;
+}
+
+button.del:active {
+    background-color: #d87a3c;
+}
+
+.edit-event {
+    float: right;
+    font-size: 20pt;
+}
+
+.add-event {
+    text-align: center;
+}
+
+.add-event button {
+    font-size: 16pt;
 }
