@@ -39,6 +39,13 @@ ul#main {
     display: block;
 }
 
+ul#main input {
+    border: 2px solid #2D383A;
+    color: #2D383A;
+    background: none;
+    font-family: 'PT Sans Narrow', sans-serif;
+}
+
 li.event {
     width: 800px;
     display: block;
@@ -64,21 +71,36 @@ li.event > .date > h2 { margin: 5px; }
     display: inline-block;
 }
 
-.main >  h1 {
+.main h1 {
     margin: 0;
     width: 100%;
     font-size: 36pt;
     display: inline-block;
 }
 
-.main >  h2 {
+.main h1 input {
+    font-weight: bold;
+    background: none;
+    border-radius: 5px;
+    width: 400px;
+    font-size: 36pt;
+}
+
+.main h2 {
     margin: 0;
     width: 100%;
     font-size: 24pt;
 }
 
-.main > p {width: 100%;}
-.main > .info > time { margin-right: 5px; }
+.main p {width: 100%; display: inline-block;}
+.main .info > time { margin-right: 5px; }
+.main .info > time > input {
+    border-width: 1px;
+    font-weight: bold;
+    border-radius: 1px;
+    width: 50px;
+}
+
 .participants > ul {
     display: block;
     list-style: none;
@@ -99,13 +121,13 @@ li.event > .date > h2 { margin: 5px; }
 }
 
 .participants > ul input {
-    background: none;
     font-weight: bold;
-    border: 2px solid white;
+    border: 2px solid white !important;
     border-radius: 5px;
-    color: white;
+    color: white !important;
     padding: 2px;
     margin: 5px;
+    font-size: 10pt;
 }
 
 .participant-yes {
