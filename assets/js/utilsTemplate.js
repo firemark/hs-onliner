@@ -18,6 +18,11 @@ TimeObj.prototype.show = function () {
     return this.hour + ":" + this.add_zero + this.minute;
 };
 
+TimeObj.fromRawToMin = function (raw) {
+    var arr = raw.split(":");
+    return parseInt(arr[0]) * 60 + parseInt(arr[1]);
+};
+
 var TimeEdit = React.createClass({displayName: "TimeEdit",
    render: function () {
        var value = this.props.value;

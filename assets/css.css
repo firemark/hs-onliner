@@ -39,7 +39,7 @@ ul#main {
     display: block;
 }
 
-ul#main input {
+ul#main input, ul#main select {
     border: 2px solid #2D383A;
     color: #2D383A;
     background: none;
@@ -59,8 +59,24 @@ li.event > .date {
     width: 100px;
     height: 100px;
     margin: 5px;
-    text-align:center;
+    text-align: center;
     background-color: white;
+}
+
+li.event > .date h1{
+    font-size: 24pt;
+}
+
+li.event > .date small{
+    font-size: 12pt;
+}
+
+li.event > .date select {
+    font-size: 16pt;
+}
+
+li.event > .date small select {
+    font-size: 10pt;
 }
 
 li.event > .date > h2 { margin: 5px; }
@@ -93,6 +109,7 @@ li.event > .date > h2 { margin: 5px; }
 }
 
 .main p {width: 100%; display: inline-block;}
+.main p input {width: 500px;}
 .main .info > time { margin-right: 5px; display: inline-block; }
 .main .info > time > input {
     border-width: 1px;

@@ -1,7 +1,7 @@
-var eventSelectRangeMap = function (a, b) {
+var eventSelectRangeMap = function (a, b, c) {
     var aa = b !== undefined? a : 1;
     var bb = b !== undefined? b : a;
-    return _.range(aa, bb + 1).map(function (i) {
+    return _.range(aa, bb + 1, c || 1).map(function (i) {
         var add_zero = i < 10? '0' : '';
         return <option key={i} value={i}>{add_zero + i}</option>;
     })
@@ -10,7 +10,7 @@ var eventSelectRangeMap = function (a, b) {
 var EventTemplate = React.createClass({
     getInitialState: function() {
         return {
-            participants: [],
+            participants: null,
             isEditable: false,
             topic: '',
             description: '',
@@ -25,7 +25,7 @@ var EventTemplate = React.createClass({
         var isEditable = this.state.isEditable;
         var is_logged = this.props.is_logged;
         var days = new Date(state.date.getYear(), state.date.getDay(), 0).getDate();
-        var date = ['XX', 'XX', 'XXXX'];
+        var date = [];
         if (attrs.date)
             date = attrs.date.split('-');
 
@@ -40,7 +40,7 @@ var EventTemplate = React.createClass({
                 <If cond={this.props.event.isNew()}>
                     <div className='date'>
                         <h1>
-                            <select value={state.date.getDay()} onChange={this.setDay}>
+                            <select value={state.date.getDate()} onChange={this.setDay}>
                                 {eventSelectRangeMap(days)}
                             </select>
                             -
@@ -50,7 +50,7 @@ var EventTemplate = React.createClass({
                         </h1>
                         <small>
                             <select value={state.date.getFullYear()} onChange={this.setYear}>
-                                {eventSelectRangeMap(2014, state.date.getFullYear() + 2)}
+                                {eventSelectRangeMap(state.date.getFullYear() + 2, 2013, -1)}
                             </select>
                         </small>
                     </div>
@@ -60,7 +60,7 @@ var EventTemplate = React.createClass({
                         <h1>
                             {attrs.topic}
                             <If cond={is_logged}>
-                                <button className="edit-event del">❌</button>
+                                <button className="edit-event del" onClick={this.del}>❌</button>
                                 <button className="edit-event" onClick={this.edit}>✎</button>
                             </If>
                         </h1>
@@ -96,7 +96,9 @@ var EventTemplate = React.createClass({
                                   onChange={this.changeInput('time_end_min')} />
                             </time>
                         </div>
-                        <textarea onChange={this.changeInput('description')} value={state.description}></textarea>
+                        <p>
+                            <input value={state.description} onChange={this.changeInput('description')} />
+                        </p>
                     </If>
 
                     <ParticipantsTemplate
@@ -107,20 +109,28 @@ var EventTemplate = React.createClass({
         );
     },
     componentWillMount: function () {
-        this.setState({isEditable: this.props.event.isNew()});
-        this.props.event.participants.on("update", function (participants) {
-            this.setState({participants: participants});
+        var event = this.props.event;
+        this.setState({isEditable: event.isNew()});
+        event.on("sync", function () {
+            event.participants.fetch();
         }.bind(this));
+
+        var change_part = function (participants) {
+            if (!(participants instanceof Backbone.Collection))
+                return;
+            this.setState({participants: participants});
+        }.bind(this);
+        event.participants.on("sync", change_part);
+        event.participants.on("update", change_part);
     },
     edit: function () {
         var attrs = this.props.event.attributes;
-        this.setState({isEditable: true});
-        var time_start = attrs.time_start.split(':');
-        var time_end = attrs.time_start.split(':');
         this.setState({
+            isEditable: true,
             topic: attrs.topic,
-            description: attrs.descritption
-
+            description: attrs.description,
+            time_start: TimeObj.fromRawToMin(attrs.time_start),
+            time_end: TimeObj.fromRawToMin(attrs.time_end)
         });
     },
     del: function () {
@@ -167,12 +177,15 @@ var EventTemplate = React.createClass({
         }.bind(this);
     },
     setDay: function(ev) {
-        this.setState({date: this.date.setDate(ev.target.value)});
+        this.state.date.setDate(ev.target.value);
+        this.setState({date: this.state.date});
     },
     setMonth: function(ev) {
-        this.setState({date: this.date.setDate(ev.target.value)});
+        this.state.date.setMonth(ev.target.value - 1);
+        this.setState({date: this.state.date});
     },
     setYear: function(ev) {
-        this.setState({date: this.date.setDate(ev.target.value)});
+        this.state.date.setYear(ev.target.value)
+        this.setState({date: this.state.date});
     }
 });

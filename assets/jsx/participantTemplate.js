@@ -57,7 +57,7 @@ var ParticipantsTemplate = React.createClass({
     render: function() {
         var parts = this.props.participants;
         var is_logged = this.props.is_logged;
-        if (!parts)
+        if (_.isNull(parts))
             return <div className='participants'></div>;
 
         var RenderedParts = parts.map(function (participant){
