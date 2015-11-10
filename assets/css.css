@@ -93,7 +93,7 @@ li.event > .date > h2 { margin: 5px; }
 }
 
 .main p {width: 100%; display: inline-block;}
-.main .info > time { margin-right: 5px; }
+.main .info > time { margin-right: 5px; display: inline-block; }
 .main .info > time > input {
     border-width: 1px;
     font-weight: bold;
@@ -116,8 +116,8 @@ li.event > .date > h2 { margin: 5px; }
 }
 
 .participants > ul button {
-    padding: 2px;
     margin: 5px;
+    font-size: 8pt;
 }
 
 .participants > ul input {

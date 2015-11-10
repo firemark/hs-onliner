@@ -5,6 +5,10 @@ var Session = Backbone.Model.extend({
         login: null,
         id: null,
         token: null
+    },
+    sync: function (method, model, options) {
+        model.unset('password');
+        Backbone.sync.call(this, method, model, options);
     }
 });
 

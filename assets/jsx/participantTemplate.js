@@ -40,7 +40,7 @@ var ParticipantTemplate = React.createClass({
                 this.setState(this.getInitialState());
             }.bind(this),
             error: function () {
-                participant.clear();
+                participant.set({name: null});
             }.bind(this)
         });
     },
@@ -55,11 +55,10 @@ var ParticipantTemplate = React.createClass({
 
 var ParticipantsTemplate = React.createClass({
     render: function() {
-        var parts = this.props.participants.models;
+        var parts = this.props.participants;
         var is_logged = this.props.is_logged;
         if (!parts)
             return <div className='participants'></div>;
-
 
         var RenderedParts = parts.map(function (participant){
             return <ParticipantTemplate
@@ -74,15 +73,15 @@ var ParticipantsTemplate = React.createClass({
                 <ul>
                     {RenderedParts}
                     <If cond={is_logged}>
-                        <li>
-                            <button onClick={this.addParticipant}>add</button>
-                        </li>
+                        <li><button onClick={this.add}>add</button></li>
                     </If>
                 </ul>
             </div>
         );
     },
-    addParticipant: function () {
-        this.props.participants.add([{}]);
+    add: function () {
+        var parts = this.props.participants;
+        if (!parts.findWhere({name: null}))
+            this.props.participants.add([{}]);
     }
 });

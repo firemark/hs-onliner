@@ -18,12 +18,17 @@ var MainTemplate = React.createClass({displayName: "MainTemplate",
               React.createElement(LoginTemplate, {is_logged: is_logged}), 
               React.createElement(If, {cond: is_logged}, 
                   React.createElement("div", {className: "block add-event"}, 
-                    React.createElement("button", null, "add event")
+                    React.createElement("button", {onClick: this.add}, "add event")
                   )
               ), 
               React.createElement("ul", {id: "main"}, list)
           )
         );
+    },
+    add: function () {
+        var events = this.state.events;
+        if (!events.findWhere({date: null}))
+            events.add([{}], {at: 0});
     }
 });
 
@@ -33,11 +38,10 @@ function init() {
       document.getElementById('events')
     );
     var eventCollection = new EventCollection;
-    eventCollection.fetch({
-        success: function () {
-            template.setState({events: eventCollection.models});
-        }
+    eventCollection.on('update', function () {
+        template.setState({events: eventCollection});
     });
+    eventCollection.fetch();
     session.on('sync', function () {
        template.setState({
            login: session.get('login')

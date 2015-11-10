@@ -40,7 +40,7 @@ var ParticipantTemplate = React.createClass({displayName: "ParticipantTemplate",
                 this.setState(this.getInitialState());
             }.bind(this),
             error: function () {
-                participant.clear();
+                participant.set({name: null});
             }.bind(this)
         });
     },
@@ -55,11 +55,10 @@ var ParticipantTemplate = React.createClass({displayName: "ParticipantTemplate",
 
 var ParticipantsTemplate = React.createClass({displayName: "ParticipantsTemplate",
     render: function() {
-        var parts = this.props.participants.models;
+        var parts = this.props.participants;
         var is_logged = this.props.is_logged;
         if (!parts)
             return React.createElement("div", {className: "participants"});
-
 
         var RenderedParts = parts.map(function (participant){
             return React.createElement(ParticipantTemplate, {
@@ -74,15 +73,15 @@ var ParticipantsTemplate = React.createClass({displayName: "ParticipantsTemplate
                 React.createElement("ul", null, 
                     RenderedParts, 
                     React.createElement(If, {cond: is_logged}, 
-                        React.createElement("li", null, 
-                            React.createElement("button", {onClick: this.addParticipant}, "add")
-                        )
+                        React.createElement("li", null, React.createElement("button", {onClick: this.add}, "add"))
                     )
                 )
             )
         );
     },
-    addParticipant: function () {
-        this.props.participants.add([{}]);
+    add: function () {
+        var parts = this.props.participants;
+        if (!parts.findWhere({name: null}))
+            this.props.participants.add([{}]);
     }
 });
