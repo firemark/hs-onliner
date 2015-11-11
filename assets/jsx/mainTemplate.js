@@ -29,23 +29,30 @@ var MainTemplate = React.createClass({
         var events = this.state.events;
         if (!events.findWhere({date: null}))
             events.add([{}], {at: 0});
+    },
+    componentWillMount: function () {
+        var eventCollection = new EventCollection;
+        var change_event = function (events) {
+            if (!(events instanceof Backbone.Collection))
+                return;
+            this.setState({events: events});
+        }.bind(this);
+        eventCollection.on("sync", change_event);
+        eventCollection.on("update", change_event);
+        eventCollection.fetch();
+        session.on('sync', function () {
+           this.setState({
+               login: session.get('login')
+           })
+        }.bind(this));
     }
 });
 
 function init() {
-    var template = ReactDOM.render(
+    ReactDOM.render(
       <MainTemplate />,
       document.getElementById('events')
     );
-    var eventCollection = new EventCollection;
-    eventCollection.on('update', function () {
-        template.setState({events: eventCollection});
-    });
-    eventCollection.fetch();
-    session.on('sync', function () {
-       template.setState({
-           login: session.get('login')
-       })
-    });
+
 
 }
